@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter } from 'next/router';
-import { useAuth } from '@/hooks/useAuth';
+import { useRouter,usePathname } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 import type { ReactNode } from 'react';
+import path from 'node:path';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -20,15 +21,12 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 }) => {
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
-
+  const pathname = usePathname();
   useEffect(() => {
     if (!isLoading) {
       if (requireAuth && !isAuthenticated) {
         const redirect = redirectTo || '/auth/login';
-        router.push({
-          pathname: redirect,
-          query: { redirect: router.asPath },
-        });
+        router.push(`${redirect}?redirect=${encodeURIComponent(pathname)}`);
       } else if (requireGuest && isAuthenticated) {
         const redirect = redirectTo || '/dashboard';
         router.push(redirect);

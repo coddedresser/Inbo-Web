@@ -1,8 +1,16 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { authService } from '@/services/auth';
-import type { User, LoginCredentials, AuthState, OTPVerify, MagicLinkRequest, GoogleAuthRequest, AppleAuthRequest } from '@/types/auth';
+import type {
+  User,
+  LoginCredentials,
+  AuthState,
+  OTPVerify,
+  MagicLinkRequest,
+  GoogleAuthRequest,
+  AppleAuthRequest,
+} from '@/types/auth';
 
 interface AuthContextType extends AuthState {
   login: (credentials: LoginCredentials) => Promise<void>;
@@ -33,38 +41,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     error: null,
   });
 
+  // Prevent multiple refreshUser runs on mount
+  const hasTriedRestoreRef = useRef(false);
+
   const refreshUser = useCallback(async () => {
     try {
       if (authService.isAuthenticated()) {
         const user = await authService.getCurrentUser();
-        setState((prev) => ({
-          ...prev,
+        setState({
           user,
           isAuthenticated: true,
           isLoading: false,
           error: null,
-        }));
+        });
       } else {
-        setState((prev) => ({
-          ...prev,
+        setState({
           user: null,
           isAuthenticated: false,
           isLoading: false,
           error: null,
-        }));
+        });
       }
     } catch (error: any) {
-      setState((prev) => ({
-        ...prev,
+      setState({
         user: null,
         isAuthenticated: false,
         isLoading: false,
         error: error?.response?.data?.message || 'Failed to fetch user',
-      }));
+      });
     }
   }, []);
 
   useEffect(() => {
+    // Ensure we only attempt restore once during client mount to avoid loops
+    if (hasTriedRestoreRef.current) return;
+    hasTriedRestoreRef.current = true;
+
+    // Run restore
     refreshUser();
   }, [refreshUser]);
 
@@ -254,4 +267,3 @@ export const useAuth = (): AuthContextType => {
   }
   return context;
 };
-

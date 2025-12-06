@@ -1,0 +1,96 @@
+"use client";
+
+import { useRef } from "react";
+import Image from "next/image";
+import NewsletterCard, { NewsletterEntry } from "@/components/NewsletterCarouselItem";
+
+interface CarouselProps {
+  title: string;
+  items: NewsletterEntry[];
+  showArrows?: boolean; // <--- NEW PROP
+}
+
+export default function NewsletterCarousel({
+  title,
+  items = [],
+  showArrows = true,
+}: CarouselProps) {
+  // Needed so arrows scroll the carousel
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const scroll = (direction: "left" | "right") => {
+    if (!scrollRef.current) return;
+    const amount = 320; // width of one card + gap
+    scrollRef.current.scrollBy({
+      left: direction === "left" ? -amount : amount,
+      behavior: "smooth",
+    });
+  };
+
+  return (
+    <div className="flex flex-col gap-4 w-full relative">
+      {/* Title */}
+      <h3 className="text-[24px] ml-2 font-semibold leading-[28px] text-[#0F0F0F]">
+        {title}
+      </h3>
+
+      {/* Wrapper (relative so arrows can sit over it) */}
+      <div className="relative">
+        {/* LEFT ARROW */}
+        {showArrows && (
+          <button
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-black rounded-full shadow-md "
+            onClick={() => scroll("left")}
+          >
+            <Image
+              src="/icons/carouselarrow-icon.png"
+              alt="Scroll left"
+              width={32}
+              height={32}
+            />
+          </button>
+        )}
+
+        {/* Scroll Container */}
+        <div
+          ref={scrollRef}
+          className="carousel-scroll flex gap-4 overflow-x-auto pb-3"
+          style={{ WebkitOverflowScrolling: "touch" }}
+        >
+          {items.map((item, i) => (
+            <div key={i} className="min-w-[280px] relative pointer-events-auto">
+              <NewsletterCard {...item} />
+            </div>
+          ))}
+        </div>
+
+        {/* RIGHT ARROW */}
+        {showArrows && (
+          <button
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-black rounded-full shadow-md "
+            onClick={() => scroll("right")}
+          >
+            <Image
+              src="/icons/carouselarrow-icon.png"
+              alt="Scroll right"
+              width={32}
+              height={32}
+              className="rotate-180"
+            />
+          </button>
+        )}
+      </div>
+
+      {/* Hide scrollbar */}
+      <style jsx>{`
+        .carousel-scroll {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .carousel-scroll::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
+    </div>
+  );
+}

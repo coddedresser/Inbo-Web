@@ -1,0 +1,131 @@
+"use client";
+import { Mail } from "lucide-react";
+import Image from "next/image";
+
+export interface NewsletterEntry {
+  title: string;
+  description: string;
+  imageUrl: string;
+  frequency: string;
+  ctaLabel: string;
+  tagLabel?: string;
+  tagIcon?: string;
+}
+
+export default function NewsletterCarouselItem({
+  title,
+  description,
+  imageUrl,
+  frequency,
+  ctaLabel,
+  tagLabel,
+  tagIcon,
+}: NewsletterEntry) {
+  return (
+    <div className="w-full max-w-[280px] flex-none p-4 bg-white rounded-[20px] shadow-sm flex flex-col gap-3 relative z-10">
+
+      {/* IMAGE WITH TAG OVERLAY */}
+      <div className="relative w-full h-[173px] bg-[#F3F4F6] rounded-[16px] overflow-hidden">
+
+        {/* TAG OVERLAY */}
+        {tagLabel && (
+          <div
+            className="
+              absolute top-3 left-3
+              flex items-center gap-1.5
+              bg-white/90 backdrop-blur
+              px-3 py-1 rounded-full shadow-sm
+              text-[#0C1014] text-[12px] font-medium leading-[16px]
+            "
+            style={{ pointerEvents: 'none' }}
+          >
+            {tagIcon && <span className="text-[14px]">{tagIcon}</span>}
+            <span>{tagLabel}</span>
+          </div>
+        )}
+
+        <img
+          src={imageUrl}
+          alt={title}
+          className="w-full h-full object-cover pointer-events-none"
+        />
+      </div>
+
+      {/* CONTENT */}
+      <div className="flex flex-col gap-6">
+
+        {/* TITLE + DESCRIPTION */}
+        <div className="flex flex-col gap-1">
+          <h3 className="text-black text-[20px] font-medium leading-[30px]">
+            {title}
+          </h3>
+
+          <p className="text-[#6F7680] text-[14px] font-normal leading-[16px]">
+            {description}
+          </p>
+        </div>
+
+        {/* CTA + FREQUENCY */}
+        <div className="flex justify-between items-center">
+
+          {/* CTA BUTTON */}
+          <button
+            className="
+              cursor-pointer
+              group
+              w-[114px] h-[36px]
+              bg-[#0C1014]
+              text-white
+              rounded-full
+              flex items-center justify-center gap-2
+              text-[14px] font-medium leading-[16px]
+              transition-all duration-300
+              hover:bg-[#F2F3F5]
+              hover:text-[#0C1014]
+            "
+          >
+            <span>{ctaLabel}</span>
+
+            <span className="text-[16px] leading-none flex items-center relative">
+              <Image
+                src="/icons/subscribe-icon-light.png"
+                alt=""
+                width={16}
+                height={16}
+                draggable={false}
+                className="block group-hover:hidden"
+              />
+
+              <Image
+                src="/icons/subscribe-icon-dark.png"
+                alt=""
+                width={16}
+                height={16}
+                draggable={false}
+                className="hidden group-hover:block"
+              />
+            </span>
+          </button>
+
+          {/* FREQUENCY */}
+          <div className="px-1.5 py-1 rounded-b-[12px] flex items-center gap-2">
+            <span className="text-[16px]">
+              <Image
+                src="/icons/frequency-icon.png"
+                alt=""
+                width={16}
+                height={16}
+                draggable={false}
+                className="pointer-events-none"
+              />
+            </span>
+            <span className="text-[#0C1014] text-[12px] font-normal leading-[16px]">
+              {frequency}
+            </span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+}

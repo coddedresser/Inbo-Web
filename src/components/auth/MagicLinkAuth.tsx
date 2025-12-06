@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useAuth } from '@/hooks/useAuth';
-import { useTranslation } from 'next-i18next';
+import { useAuth } from '@/contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 interface MagicLinkAuthProps {
   onSuccess?: () => void;
