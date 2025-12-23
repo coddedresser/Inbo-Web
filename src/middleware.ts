@@ -150,6 +150,6 @@ export function middleware(request: NextRequest) {
 // Run on all routes except static files
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    
   ],
 };
