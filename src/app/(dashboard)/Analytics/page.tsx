@@ -1,6 +1,9 @@
 "use client";
+
 export const dynamic = "force-dynamic";
-import { useState } from "react";
+export const revalidate = 0;
+
+import { useState, useEffect } from "react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 import ReadingInsightsCard from "@/components/analytics/ReadingInsightsCard";
@@ -12,21 +15,14 @@ import AchievementsBottomSheet from "@/components/analytics/AchievementsBottomSh
 import MobileAnalyticsSection from "./MobileAnalyticsSection";
 
 /* TEMP placeholders — replace later */
-import { Star, Bookmark, ChevronUp } from "lucide-react";
+import { Star, ChevronUp } from "lucide-react";
+
+/* ===============================
+   Reusable Rows
+================================ */
 
 export const FavouriteRow = () => (
-  <div
-    className="
-      w-full
-      bg-white
-      rounded-2xl
-      px-6 py-4
-      shadow-[0_1px_4px_rgba(0,0,0,0.08)]
-      flex items-center justify-between
-      cursor-pointer
-    "
-  >
-    {/* Left */}
+  <div className="w-full bg-white rounded-2xl px-6 py-4 shadow-[0_1px_4px_rgba(0,0,0,0.08)] flex items-center justify-between cursor-pointer">
     <div className="flex items-center gap-3">
       <div className="w-10 h-10 rounded-full bg-[#FFF4E5] flex items-center justify-center">
         <Star className="w-5 h-5 text-[#F59E0B]" fill="currentColor" />
@@ -35,25 +31,12 @@ export const FavouriteRow = () => (
         Favourite
       </span>
     </div>
-
-    {/* Right */}
     <ChevronUp className="w-5 h-5 text-gray-900" />
   </div>
 );
 
 export const ReadLaterRow = () => (
-  <div
-    className="
-      w-full
-      bg-white
-      rounded-2xl
-      px-6 py-4
-      shadow-[0_1px_4px_rgba(0,0,0,0.08)]
-      flex items-center justify-between
-      cursor-pointer
-    "
-  >
-    {/* Left */}
+  <div className="w-full bg-white rounded-2xl px-6 py-4 shadow-[0_1px_4px_rgba(0,0,0,0.08)] flex items-center justify-between cursor-pointer">
     <div className="flex items-center gap-3">
       <div className="w-10 h-10 rounded-full bg-[#E8F1FF] flex items-center justify-center">
         <img src="/icons/read-later-icon.png" alt="read-later" />
@@ -62,20 +45,30 @@ export const ReadLaterRow = () => (
         Read Later
       </span>
     </div>
-
-    {/* Right */}
     <ChevronUp className="w-5 h-5 text-gray-900" />
   </div>
 );
 
+/* ===============================
+   Page
+================================ */
 
 export default function AnalyticsPage() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   const [isStreakOpen, setIsStreakOpen] = useState(false);
   const [isAchievementsOpen, setIsAchievementsOpen] = useState(false);
 
-  /* ================= MOBILE RETURN ================= */
+  // Prevent hydration issues on Vercel
+  if (!mounted) return null;
+
+  /* ================= MOBILE ================= */
   if (isMobile) {
     return (
       <div className="w-full min-h-screen bg-[#F5F6FA]">
@@ -84,7 +77,6 @@ export default function AnalyticsPage() {
           onOpenAchievements={() => setIsAchievementsOpen(true)}
         />
 
-        {/* Mobile Bottom Sheets */}
         <StreakBottomSheet
           open={isStreakOpen}
           onClose={() => setIsStreakOpen(false)}
@@ -97,60 +89,56 @@ export default function AnalyticsPage() {
     );
   }
 
-  /* ================= DESKTOP RETURN ================= */
+  /* ================= DESKTOP ================= */
   return (
     <div className="w-full min-h-screen bg-[#F5F6FA]">
-      {/* Desktop Header */}
+      {/* Header */}
       <div className="w-full h-[72px] bg-white border-b border-[#E5E7EB] flex items-center px-8">
         <h2 className="text-[24px] font-semibold text-[#0C1014]">
           Analytics
         </h2>
       </div>
 
-      {/* Subtitle BELOW header (styled correctly) */}
+      {/* Subtitle */}
       <div className="px-8 pt-3 pb-2">
         <p className="text-[14px] leading-[20px] text-[#6B7280] max-w-[720px]">
           Track your reading – by time, words, and what you’ve read.
         </p>
       </div>
 
-      {/* Desktop Grid */}
+      {/* Grid */}
       <div className="grid grid-cols-12 gap-x-4 gap-y-6 px-8 pb-6">
-        {/* Row 1: Reading Insights */}
         <div className="col-span-12 rounded-2xl overflow-hidden">
           <ReadingInsightsCard />
         </div>
 
-        {/* Row 2: More Like | Inbox Snapshot */}
         <div className="col-span-12">
           <InboxOverview />
         </div>
 
-        {/* Row 3: Favourite | Read Later */}
         <div className="col-span-6">
           <FavouriteRow />
         </div>
+
         <div className="col-span-6">
           <ReadLaterRow />
         </div>
 
-        {/* Row 4: Daily Streak | Achievements */}
         <div className="col-span-5 h-full">
           <DailyStreakCard
             onOpen={() => setIsStreakOpen(true)}
             className="h-full"
           />
         </div>
+
         <div className="col-span-7 h-full">
           <AchievementsCard
             onOpen={() => setIsAchievementsOpen(true)}
             className="h-full"
           />
         </div>
-
       </div>
 
-      {/* Desktop Bottom Sheets */}
       <StreakBottomSheet
         open={isStreakOpen}
         onClose={() => setIsStreakOpen(false)}
