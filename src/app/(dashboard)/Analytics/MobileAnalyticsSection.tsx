@@ -43,7 +43,7 @@ export default function MobileAnalyticsSection({
       >
         {/* Top Header */}
         <div className={`flex items-center justify-center relative mb-6 ${
-          hasStreak ? "bg-[#FF9600] text-white" : "bg-[#FFD7A3] text-black"
+          hasStreak ? " text-white" : "text-black"
         }`}>
           {/* Back Button */}
           <button
